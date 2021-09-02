@@ -7,3 +7,5 @@ A script for scraping fire data from [NOAA's Hazard Mapping System Fire and Smok
 - add option for date range
 - add code to default to current day
 - add option to pretty pring JSON
+
+![pulaski](./pulaski.jpg)
