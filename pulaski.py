@@ -1,11 +1,23 @@
 from urllib.request import urlopen
-import json
+from datetime import date
+import json, sys, getopt
 from geojson import Feature, FeatureCollection, Point
 
-URL = "https://satepsanone.nesdis.noaa.gov/pub/FIRE/web/HMS/Fire_Points/Text/2021/09/hms20210902.txt"
-data = urlopen(URL)
+
 event_list = []
 features = []
+today = date.today()
+
+def get_data(date):
+    baseURL = "https://satepsanone.nesdis.noaa.gov/pub/FIRE/web/HMS/Fire_Points/Text/" 
+    if date == "":
+        file_path = today.strftime("%Y")+"/"+today.strftime("%m")+"/"+"hms"+today.strftime("%Y%m%d")+".txt"
+    else:
+        file_path = date[0:4]+"/"+date[4:6]+"/hms"+date+".txt"
+    
+    URL = baseURL+file_path
+    print(URL)
+    return urlopen(URL)
 
 def clean_data(line):
     decode = line.decode("utf-8")
@@ -36,6 +48,12 @@ def to_geojson(event_list):
     return events_json
 
 # process data to lists
+
+if len(sys.argv) > 1:
+    data = get_data(sys.argv[1])
+else:
+    data = get_data("")
+
 for line in data:
     event_list.append(clean_data(line))
 
@@ -45,10 +63,10 @@ features = to_geojson(event_list)
 collection = FeatureCollection(features)
 
 # write to file 
-with open("fires.json", "w") as f:
+if len(sys.argv) > 1:
+    file_out = "fires_"+sys.argv[1]+".json"
+else:
+    file_out = "fires_"+today.strftime("%Y%m%d")+".json"
+with open(file_out, "w") as f:
     f.write('%s' % collection)
-
-
-    
-print(event_list)
     
